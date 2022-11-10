@@ -1,8 +1,8 @@
 import { ICombination } from './../reducers/RowReducer';
 import { ACTIONS } from '../types/actions';
 
-export const createRow = () => {
-	return { type: ACTIONS.CREATE_ROW };
+export const createRow = (rowLength: number) => {
+	return { type: ACTIONS.CREATE_ROW, payload: rowLength };
 }
 
 export const updateRow = (row: string[]) => {

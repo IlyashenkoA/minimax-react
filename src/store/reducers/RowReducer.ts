@@ -23,7 +23,7 @@ export interface ICombination {
 
 interface RowAction {
 	type: string;
-	payload: string[];
+	payload: any;
 }
 
 export const RowReducer = (state = initialState, action: RowAction) => {
@@ -31,7 +31,7 @@ export const RowReducer = (state = initialState, action: RowAction) => {
 		case ACTIONS.CREATE_ROW:
 			return {
 				...state,
-				row: Array.from({ length: LENGTH }, () =>
+				row: Array.from({ length: action.payload }, () =>
 					Math.floor(Math.random() * 2).toString()
 				),
 			};

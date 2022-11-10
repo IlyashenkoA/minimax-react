@@ -1,7 +1,7 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { AlertColor, Box, FormControlLabel, Grid } from '@mui/material'
+import { AlertColor, Box, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import Button from '@mui/material/Button'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
@@ -34,6 +34,12 @@ const App: React.FC = () => {
   const [alertData, setAlertData] = useState<IAlert>(Object);
 
   const [resetCheckbox, setResetCheckbox] = useState<boolean>(false);
+
+  const [rowLength, setRowLength] = useState<number>(10);
+
+  useEffect(() => {
+    dispatch(createRow(rowLength));
+  }, [rowLength])
 
   const dispatch = useDispatch();
 
@@ -123,7 +129,7 @@ const App: React.FC = () => {
     setMoveButtonStatus(true);
     setStartStatus(false);
 
-    dispatch(createRow());
+    dispatch(createRow(rowLength));
   }
 
   const onStartClick = () => {
@@ -133,7 +139,7 @@ const App: React.FC = () => {
 
         // If a game has been played, create a new row of numbers
         if (row.length === 2) {
-          dispatch(createRow())
+          dispatch(createRow(rowLength))
         }
         break;
       case Players.COMPUTER:
@@ -141,7 +147,7 @@ const App: React.FC = () => {
 
         // If a game has been played, create a new row of numbers
         if (row.length === 2) {
-          dispatch(createRow())
+          dispatch(createRow(rowLength))
         }
 
         const step = computerMove(row);
@@ -160,6 +166,10 @@ const App: React.FC = () => {
 
   const onStopClick = () => {
     setStopSettings();
+  }
+
+  const handleRowLength = (e: SelectChangeEvent<number>) => {
+    setRowLength(+e.target.value);
   }
 
   return (
@@ -186,12 +196,12 @@ const App: React.FC = () => {
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', margin: '0 20px', height: '100%' }}>
               {row.map((value, index) => {
                 return (
-                  <Number key={index} position={index} value={+value} disabled={moveButtonStatus} reset={resetCheckbox} setReset={setResetCheckbox}/>
+                  <Number key={index} position={index} value={+value} disabled={moveButtonStatus} reset={resetCheckbox} setReset={setResetCheckbox} />
                 )
               })}
             </Box>
           </Grid>
-          <Grid item xs={4} height="30vh" style={{ paddingLeft: '0' }}>
+          <Grid item xs={6} height="30vh" style={{ paddingLeft: '0' }}>
             <Grid
               container
               spacing={2}
@@ -208,12 +218,29 @@ const App: React.FC = () => {
                   <FormControlLabel value={Players.COMPUTER} control={<Radio disabled={startStatus} />} label="Computer" />
                 </RadioGroup>
               </Grid>
-              <Grid item xs={6} />
+              <Grid item xs={6} style={{ paddingLeft: '0' }}>
+                <FormControl sx={{ width: '150px' }}>
+                  <InputLabel id="demo-simple-select-label">Row length</InputLabel>
+                  <Select
+                    defaultValue={rowLength}
+                    value={rowLength}
+                    onChange={handleRowLength}
+                    disabled={startStatus}
+                  >
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={11}>11</MenuItem>
+                    <MenuItem value={12}>12</MenuItem>
+                    <MenuItem value={13}>13</MenuItem>
+                    <MenuItem value={14}>14</MenuItem>
+                    <MenuItem value={15}>15</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
               <Grid item xs={6} style={{ paddingLeft: '0' }}>
                 <Button variant="contained" onClick={onStartClick} disabled={startStatus}>Start/Repeat</Button>
               </Grid>
               <Grid item xs={6} style={{ paddingLeft: '0' }}>
-                <Button variant="outlined" onClick={onStopClick}>Stop</Button>
+                <Button variant="outlined" onClick={onStopClick} sx={{ width: '150px' }}>Stop</Button>
               </Grid>
             </Grid>
           </Grid>
