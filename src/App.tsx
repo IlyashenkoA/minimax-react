@@ -142,7 +142,7 @@ const App: React.FC = () => {
         setStartSettings();
 
         // If a game has been played, create a new row of numbers
-        if (row.length === 2) {
+        if (isGameOver(row)) {
           dispatch(createRow(rowLength))
         }
         break;
@@ -150,7 +150,7 @@ const App: React.FC = () => {
         setStartSettings();
 
         // If a game has been played, create a new row of numbers
-        if (row.length === 2) {
+        if (isGameOver(row)) {
           dispatch(createRow(rowLength))
         }
 

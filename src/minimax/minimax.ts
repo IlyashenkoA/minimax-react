@@ -138,7 +138,13 @@ export const getWinner = (row: string[], hasStarted: string) => {
 	return '';
 };
 
-const minimax = (row: string[], depth: number, isMax: boolean, alpha: number, beta: number) => {
+const minimax = (
+	row: string[],
+	depth: number,
+	isMax: boolean,
+	alpha: number,
+	beta: number
+) => {
 	let currentRow;
 	let score = evaluate(row, Players.COMPUTER);
 
@@ -186,7 +192,6 @@ const minimax = (row: string[], depth: number, isMax: boolean, alpha: number, be
 				if (beta < alpha) {
 					return best;
 				}
-
 			}
 		}
 
