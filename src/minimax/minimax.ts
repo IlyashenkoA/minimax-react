@@ -179,7 +179,7 @@ const minimax = (row: string[], depth: number, isMax: boolean, alpha: number, be
 				row.splice(i, 1);
 
 				best = Math.min(best, minimax(row, depth + 1, !isMax, alpha, beta));
-				alpha = Math.min(alpha, best);
+				beta = Math.min(alpha, best);
 
 				row = currentRow;
 
