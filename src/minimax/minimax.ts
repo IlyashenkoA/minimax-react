@@ -49,7 +49,7 @@ const getBestMove = (row: string[]) => {
 			row[i - 1] = '1';
 			row.splice(i, 1);
 
-			const moveValue = minimax(row, 0, false);
+			const moveValue = minimax(row, 0, false, -Infinity, Infinity);
 
 			row = currentRow;
 
@@ -62,7 +62,7 @@ const getBestMove = (row: string[]) => {
 		row[i - 1] = '0';
 		row.splice(i, 1);
 
-		const moveValue = minimax(row, 0, false);
+		const moveValue = minimax(row, 0, false, -Infinity, Infinity);
 
 		row = currentRow;
 
@@ -138,7 +138,7 @@ export const getWinner = (row: string[], hasStarted: string) => {
 	return '';
 };
 
-const minimax = (row: string[], depth: number, isMax: boolean) => {
+const minimax = (row: string[], depth: number, isMax: boolean, alpha: number, beta: number) => {
 	let currentRow;
 	let score = evaluate(row, Players.COMPUTER);
 
@@ -165,17 +165,28 @@ const minimax = (row: string[], depth: number, isMax: boolean) => {
 				row[i - 1] = '1';
 				row.splice(i, 1);
 
-				best = Math.max(best, minimax(row, depth + 1, !isMax));
+				best = Math.max(best, minimax(row, depth + 1, !isMax, alpha, beta));
+				alpha = Math.max(alpha, best);
 
 				row = currentRow;
+
+				if (alpha > beta) {
+					return best;
+				}
 			} else {
 				currentRow = [...row];
 				row[i - 1] = '0';
 				row.splice(i, 1);
 
-				best = Math.max(best, minimax(row, depth + 1, !isMax));
+				best = Math.min(best, minimax(row, depth + 1, !isMax, alpha, beta));
+				alpha = Math.min(alpha, best);
 
 				row = currentRow;
+
+				if (beta < alpha) {
+					return best;
+				}
+
 			}
 		}
 
@@ -192,7 +203,7 @@ const minimax = (row: string[], depth: number, isMax: boolean) => {
 			row[i - 1] = '1';
 			row.splice(i, 1);
 
-			best = Math.max(best, minimax(row, depth + 1, !isMax));
+			best = Math.max(best, minimax(row, depth + 1, !isMax, alpha, beta));
 
 			row = currentRow;
 		} else {
@@ -200,7 +211,7 @@ const minimax = (row: string[], depth: number, isMax: boolean) => {
 			row[i - 1] = '0';
 			row.splice(i, 1);
 
-			best = Math.max(best, minimax(row, depth + 1, !isMax));
+			best = Math.min(best, minimax(row, depth + 1, !isMax, alpha, beta));
 
 			row = currentRow;
 		}

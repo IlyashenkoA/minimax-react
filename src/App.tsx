@@ -90,6 +90,8 @@ const App: React.FC = () => {
       setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(row, whoStart) });
       setShowAlert(true);
       setMoveButtonStatus(true);
+      setStartStatus(false);
+      setResetCheckbox(true);
 
       return;
     }
@@ -108,6 +110,8 @@ const App: React.FC = () => {
       setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(row, whoStart) });
       setShowAlert(true);
       setMoveButtonStatus(true);
+      setStartStatus(false);
+      setResetCheckbox(true);
     }
   };
 
@@ -227,12 +231,12 @@ const App: React.FC = () => {
                     onChange={handleRowLength}
                     disabled={startStatus}
                   >
+                    <MenuItem value={6}>6</MenuItem>
+                    <MenuItem value={7}>7</MenuItem>
+                    <MenuItem value={8}>8</MenuItem>
+                    <MenuItem value={9}>9</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={11}>11</MenuItem>
-                    <MenuItem value={12}>12</MenuItem>
-                    <MenuItem value={13}>13</MenuItem>
-                    <MenuItem value={14}>14</MenuItem>
-                    <MenuItem value={15}>15</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
