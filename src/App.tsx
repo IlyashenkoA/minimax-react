@@ -38,9 +38,12 @@ const App: React.FC = () => {
   const [rowLength, setRowLength] = useState<number>(10);
 
   useEffect(() => {
+    // Save default rowLength in localStorage
+    localStorage.setItem('rowLength', '10');
+
     dispatch(createRow(rowLength));
 
-    if (row && row.length < rowLength && row.length > 2) {
+    if ((row && row.length < rowLength && row.length > 2) && localStorage.getItem('whoStart')) {
       setStartSettings();
       setWhoStart(localStorage.getItem('whoStart')!);
     }
@@ -48,9 +51,8 @@ const App: React.FC = () => {
 
   // Create a row when length was changed
   useEffect(() => {
-    if (rowLength === 10) return;
-
     dispatch(createRow(rowLength));
+    localStorage.setItem('rowLength', rowLength + '');
   }, [rowLength])
 
   const row = useSelector((state: RootState) => {

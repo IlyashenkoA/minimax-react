@@ -28,6 +28,10 @@ interface RowAction {
 export const RowReducer = (state = initialState, action: RowAction) => {
 	switch (action.type) {
 		case ACTIONS.CREATE_ROW:
+			const localRow = localStorage.getItem('row');
+			const localRowLength = +localStorage.getItem('rowLength')!;
+			const whoStart = localStorage.getItem('whoStart');
+
 			/**
 			 * Generate numbers between 0 and 1
 			 *
@@ -36,10 +40,11 @@ export const RowReducer = (state = initialState, action: RowAction) => {
 			 * Otherwise will be created a new array with length from a payload
 			 */
 			const row =
-				localStorage.getItem('row') &&
-				JSON.parse(localStorage.getItem('row')!).length < action.payload &&
-				JSON.parse(localStorage.getItem('row')!).length > 2
-					? JSON.parse(localStorage.getItem('row')!)
+				localRow &&
+				whoStart &&
+				JSON.parse(localRow).length <= localRowLength &&
+				JSON.parse(localRow).length > 2
+					? JSON.parse(localRow)
 					: Array.from({ length: action.payload }, () =>
 							Math.floor(Math.random() * 2).toString()
 					  );
