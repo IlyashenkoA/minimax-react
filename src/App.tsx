@@ -39,9 +39,19 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(createRow(rowLength));
-  }, [rowLength])
 
-  const dispatch = useDispatch();
+    if (row && row.length < rowLength && row.length > 2) {
+      setStartSettings();
+      setWhoStart(localStorage.getItem('whoStart')!);
+    }
+  }, [])
+
+  // Create a row when length was changed
+  useEffect(() => {
+    if (rowLength === 10) return;
+
+    dispatch(createRow(rowLength));
+  }, [rowLength])
 
   const row = useSelector((state: RootState) => {
     return state.RowReducer.row
@@ -51,8 +61,11 @@ const App: React.FC = () => {
     return state.CombinationReducer.combination;
   });
 
+  const dispatch = useDispatch();
+
   const onStartChange = (e: ChangeEvent<HTMLInputElement>) => {
     setWhoStart(e.target.value);
+    localStorage.setItem('whoStart', e.target.value);
   };
 
   const onMoveClick = () => {
@@ -89,14 +102,23 @@ const App: React.FC = () => {
     if (isGameOver(row)) {
       setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(row, whoStart) });
       setShowAlert(true);
+
       setMoveButtonStatus(true);
       setStartStatus(false);
       setResetCheckbox(true);
 
+      localStorage.clear();
+
       return;
     }
 
-    const step = computerMove(row);
+    /**
+     * Create a copy of current array
+     *
+     * For some reason, row also changes after computerMove() function is called
+     */
+    const defaultArray = [...row];
+    const step = computerMove(defaultArray);
 
     setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
     setShowAlert(true);
@@ -106,12 +128,15 @@ const App: React.FC = () => {
     setResetCheckbox(true);
 
     // Checking if the game is over and displaying a message about who won
-    if (isGameOver(row)) {
-      setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(row, whoStart) });
+    if (isGameOver(step)) {
+      setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(step, whoStart) });
       setShowAlert(true);
+
       setMoveButtonStatus(true);
       setStartStatus(false);
       setResetCheckbox(true);
+
+      localStorage.clear();
     }
   };
 
@@ -133,6 +158,9 @@ const App: React.FC = () => {
     setMoveButtonStatus(true);
     setStartStatus(false);
 
+    // Delete row from localStorage
+    localStorage.clear();
+
     dispatch(createRow(rowLength));
   }
 
@@ -140,27 +168,38 @@ const App: React.FC = () => {
     switch (whoStart) {
       case Players.HUMAN:
         setStartSettings();
+        localStorage.setItem('whoStart', Players.HUMAN);
 
         // If a game has been played, create a new row of numbers
         if (isGameOver(row)) {
           dispatch(createRow(rowLength))
         }
+
         break;
       case Players.COMPUTER:
         setStartSettings();
+        localStorage.setItem('whoStart', Players.COMPUTER);
 
         // If a game has been played, create a new row of numbers
         if (isGameOver(row)) {
-          dispatch(createRow(rowLength))
+          dispatch(createRow(rowLength));
         }
 
-        const step = computerMove(row);
+        /**
+         * In case if a game has been played, for the first move is used data from localStorage, to not display information about previous array
+         *
+         * Previous array -> ['1', '0']
+         * While current -> ['1', '0', '0', '1', '1']
+         *
+         */
+        const step = computerMove(JSON.parse(localStorage.getItem('row')!));
 
-        setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
+        setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${JSON.parse(localStorage.getItem('row')!).join('-')} => ${step.join('-')}` });
         setShowAlert(true);
 
         // Computer make a move
         dispatch(updateRow(step));
+
         break;
       default:
         setAlertData({ severity: 'warning', title: 'Warning', message: 'You have to choose who starts the move.' });
@@ -198,7 +237,7 @@ const App: React.FC = () => {
             style={{ padding: "0" }}
           >
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', margin: '0 20px', height: '100%' }}>
-              {row.map((value, index) => {
+              {row.map((value: string | number, index: number) => {
                 return (
                   <Number key={index} position={index} value={+value} disabled={moveButtonStatus} reset={resetCheckbox} setReset={setResetCheckbox} />
                 )
@@ -218,8 +257,8 @@ const App: React.FC = () => {
               <Grid item xs={6} />
               <Grid item xs={6} style={{ paddingLeft: '0' }}>
                 <RadioGroup onChange={onStartChange}>
-                  <FormControlLabel value={Players.HUMAN} control={<Radio disabled={startStatus} />} label="Human" />
-                  <FormControlLabel value={Players.COMPUTER} control={<Radio disabled={startStatus} />} label="Computer" />
+                  <FormControlLabel value={Players.HUMAN} control={<Radio disabled={startStatus} checked={whoStart === Players.HUMAN} />} label="Human" />
+                  <FormControlLabel value={Players.COMPUTER} control={<Radio disabled={startStatus} checked={whoStart === Players.COMPUTER} />} label="Computer" />
                 </RadioGroup>
               </Grid>
               <Grid item xs={6} style={{ paddingLeft: '0' }}>
@@ -236,7 +275,6 @@ const App: React.FC = () => {
                     <MenuItem value={8}>8</MenuItem>
                     <MenuItem value={9}>9</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={11}>11</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

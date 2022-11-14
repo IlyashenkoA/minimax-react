@@ -8,7 +8,7 @@ interface RowState {
 	combination: ICombination[];
 }
 
-interface ICombination {
+export interface ICombination {
 	key: number;
 	value: number;
 }

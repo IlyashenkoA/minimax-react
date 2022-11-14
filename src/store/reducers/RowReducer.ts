@@ -1,24 +1,23 @@
 import { ACTIONS } from '../types/actions';
 
-/**
- * Generate numbers between 0 and 1
- *
- * Optimal length of the array is 10
- */
 const LENGTH = 10;
+
+/**
+ * An array is created so that the logic on the first render works
+ */
 const initialState: RowState = {
-	row: Array.from({ length: LENGTH }, () =>
-		Math.floor(Math.random() * 2).toString()
-	),
+	row:
+		localStorage.getItem('row') &&
+		JSON.parse(localStorage.getItem('row')!).length <= LENGTH &&
+		JSON.parse(localStorage.getItem('row')!).length > 2
+			? JSON.parse(localStorage.getItem('row')!)
+			: Array.from({ length: LENGTH }, () =>
+					Math.floor(Math.random() * 2).toString()
+			  ),
 };
 
 interface RowState {
 	row: string[];
-}
-
-export interface ICombination {
-	key: number;
-	value: number;
 }
 
 interface RowAction {
@@ -29,15 +28,33 @@ interface RowAction {
 export const RowReducer = (state = initialState, action: RowAction) => {
 	switch (action.type) {
 		case ACTIONS.CREATE_ROW:
+			/**
+			 * Generate numbers between 0 and 1
+			 *
+			 * In case if previous game has not been finished, will be returned row from localStorage
+			 *
+			 * Otherwise will be created a new array with length from a payload
+			 */
+			const row =
+				localStorage.getItem('row') &&
+				JSON.parse(localStorage.getItem('row')!).length < action.payload &&
+				JSON.parse(localStorage.getItem('row')!).length > 2
+					? JSON.parse(localStorage.getItem('row')!)
+					: Array.from({ length: action.payload }, () =>
+							Math.floor(Math.random() * 2).toString()
+					  );
+
+			// Save a row in localStorage
+			localStorage.setItem('row', JSON.stringify(row));
+
 			return {
-				...state,
-				row: Array.from({ length: action.payload }, () =>
-					Math.floor(Math.random() * 2).toString()
-				),
+				row: row,
 			};
 		case ACTIONS.UPDATE_ROW:
+			// Update a row in localStorage
+			localStorage.setItem('row', JSON.stringify(action.payload));
+
 			return {
-				...state,
 				row: [...action.payload],
 			};
 		default:

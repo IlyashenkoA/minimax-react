@@ -1,4 +1,4 @@
-import { ICombination } from './../store/reducers/RowReducer';
+import { ICombination } from './../store/reducers/CombinationReducer';
 import { Players } from '../App';
 
 export const computerMove = (row: string[]) => {
@@ -49,7 +49,13 @@ const getBestMove = (row: string[]) => {
 			row[i - 1] = '1';
 			row.splice(i, 1);
 
-			const moveValue = minimax(row, 0, false, -Infinity, Infinity);
+			const moveValue = minimax({
+				row: row,
+				depth: 0,
+				isMax: false,
+				alpha: -Infinity,
+				beta: Infinity,
+			});
 
 			row = currentRow;
 
@@ -62,7 +68,13 @@ const getBestMove = (row: string[]) => {
 		row[i - 1] = '0';
 		row.splice(i, 1);
 
-		const moveValue = minimax(row, 0, false, -Infinity, Infinity);
+		const moveValue = minimax({
+			row: row,
+			depth: 0,
+			isMax: false,
+			alpha: -Infinity,
+			beta: Infinity,
+		});
 
 		row = currentRow;
 
@@ -138,13 +150,15 @@ export const getWinner = (row: string[], hasStarted: string) => {
 	return '';
 };
 
-const minimax = (
-	row: string[],
-	depth: number,
-	isMax: boolean,
-	alpha: number,
-	beta: number
-) => {
+interface MiniMaxProps {
+	row: string[];
+	depth: number;
+	isMax: boolean;
+	alpha: number;
+	beta: number;
+}
+
+function minimax({ row, depth, isMax, alpha, beta }: MiniMaxProps) {
 	let currentRow;
 	let score = evaluate(row, Players.COMPUTER);
 
@@ -171,7 +185,16 @@ const minimax = (
 				row[i - 1] = '1';
 				row.splice(i, 1);
 
-				best = Math.max(best, minimax(row, depth + 1, !isMax, alpha, beta));
+				best = Math.max(
+					best,
+					minimax({
+						row: row,
+						depth: depth + 1,
+						isMax: !isMax,
+						alpha: alpha,
+						beta: beta,
+					})
+				);
 				alpha = Math.max(alpha, best);
 
 				row = currentRow;
@@ -184,7 +207,16 @@ const minimax = (
 				row[i - 1] = '0';
 				row.splice(i, 1);
 
-				best = Math.min(best, minimax(row, depth + 1, !isMax, alpha, beta));
+				best = Math.min(
+					best,
+					minimax({
+						row: row,
+						depth: depth + 1,
+						isMax: !isMax,
+						alpha: alpha,
+						beta: beta,
+					})
+				);
 				beta = Math.min(alpha, best);
 
 				row = currentRow;
@@ -208,7 +240,16 @@ const minimax = (
 			row[i - 1] = '1';
 			row.splice(i, 1);
 
-			best = Math.max(best, minimax(row, depth + 1, !isMax, alpha, beta));
+			best = Math.max(
+				best,
+				minimax({
+					row: row,
+					depth: depth + 1,
+					isMax: !isMax,
+					alpha: alpha,
+					beta: beta,
+				})
+			);
 
 			row = currentRow;
 		} else {
@@ -216,11 +257,20 @@ const minimax = (
 			row[i - 1] = '0';
 			row.splice(i, 1);
 
-			best = Math.min(best, minimax(row, depth + 1, !isMax, alpha, beta));
+			best = Math.min(
+				best,
+				minimax({
+					row: row,
+					depth: depth + 1,
+					isMax: !isMax,
+					alpha: alpha,
+					beta: beta,
+				})
+			);
 
 			row = currentRow;
 		}
 	}
 
 	return best;
-};
+}
