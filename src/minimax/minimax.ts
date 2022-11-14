@@ -5,7 +5,7 @@ export const computerMove = (row: string[]) => {
 	const array = [...row];
 	const bestMove = getBestMove(array);
 
-	for (let i = 0; i < row.length; i++) {
+	for (const {} of row) {
 		const combination = row[bestMove - 1] + row[bestMove];
 
 		if (combination === '10' || combination === '00') {
