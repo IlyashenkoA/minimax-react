@@ -158,7 +158,7 @@ interface MiniMaxProps {
 	beta: number;
 }
 
-function minimax({ row, depth, isMax, alpha, beta }: MiniMaxProps) {
+const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 	let currentRow;
 	let score = evaluate(row, Players.COMPUTER);
 
