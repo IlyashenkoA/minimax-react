@@ -1,4 +1,4 @@
-import { ICombination } from './../reducers/RowReducer';
+import { ICombination } from './../reducers/CombinationReducer';
 import { ACTIONS } from '../types/actions';
 
 export const createRow = (rowLength: number) => {
