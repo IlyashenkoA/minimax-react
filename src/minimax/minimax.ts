@@ -1,11 +1,11 @@
-import { ICombination } from './../store/reducers/CombinationReducer';
+import { ICombination } from '../store/reducers/CombinationReducer';
 import { Players } from '../App';
 
 export const computerMove = (row: string[]) => {
 	const array = [...row];
 	const bestMove = getBestMove(array);
 
-	for (let i = 1; i < row.length; i++) {
+	for (let i = 0; i < row.length; i++) {
 		const combination = row[bestMove - 1] + row[bestMove];
 
 		if (combination === '10' || combination === '00') {
@@ -87,7 +87,7 @@ const getBestMove = (row: string[]) => {
 	return position;
 };
 
-const isMoveLeft = (row: string[]) => (row.length > 2 ? true : false);
+const isMoveLeft = (row: string[]) => row.length > 2;
 
 const evaluate = (combinations: string[], hasStarted: Players) => {
 	const combination = combinations.join('');
@@ -115,7 +115,7 @@ const evaluate = (combinations: string[], hasStarted: Players) => {
 	return 0;
 };
 
-export const isGameOver = (row: string[]) => (isMoveLeft(row) ? false : true);
+export const isGameOver = (row: string[]) => !isMoveLeft(row);
 
 export const getWinner = (row: string[], hasStarted: string) => {
 	const combination = row.join('');
@@ -170,7 +170,7 @@ function minimax({ row, depth, isMax, alpha, beta }: MiniMaxProps) {
 		return score;
 	}
 
-	if (isMoveLeft(row) === false) {
+	if (!isMoveLeft(row)) {
 		return 0;
 	}
 
