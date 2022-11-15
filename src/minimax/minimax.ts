@@ -2,6 +2,7 @@ import { ICombination } from '../store/reducers/CombinationReducer';
 import { Players } from '../App';
 
 export const computerMove = (row: string[]) => {
+	// Create a copy of current array
 	const array = [...row];
 	const bestMove = getBestMove(array);
 

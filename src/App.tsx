@@ -10,7 +10,7 @@ import Number from './components/Number'
 import ActionAlert from './components/ActionsAlert'
 
 import { RootState } from './store/reducers'
-import { createRow, resetCombination, updateRow } from './store/action-creators/action-creators'
+import { resetCombination } from './store/action-creators/action-creators'
 
 import { computerMove, getWinner, humanMove, isGameOver } from './minimax/minimax'
 
@@ -19,45 +19,87 @@ export enum Players {
   COMPUTER = 'COMPUTER'
 }
 
+enum localStorageKey {
+  ROW_LENGTH = 'ROW_LENGTH',
+  WHO_START = 'WHO_START',
+  ROW = 'ROW'
+}
+
 interface IAlert {
   severity: AlertColor,
   title: string,
   message: string
 }
 
+const LENGTH = 10;
+
 const App: React.FC = () => {
   const [whoStart, setWhoStart] = useState<string>('');
   const [startStatus, setStartStatus] = useState<boolean>(false);
   const [moveButtonStatus, setMoveButtonStatus] = useState<boolean>(true);
-
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [alertData, setAlertData] = useState<IAlert>(Object);
-
   const [resetCheckbox, setResetCheckbox] = useState<boolean>(false);
+  const [rowLength, setRowLength] = useState<number>(LENGTH);
+  const [row, setRow] = useState<string[]>(getDefaultRow());
 
-  const [rowLength, setRowLength] = useState<number>(10);
+  function getDefaultRow() {
+    const localRow = localStorage.getItem(localStorageKey.ROW);
+    const localRowLength = +localStorage.getItem(localStorageKey.ROW_LENGTH)!;
+    const whoStart = localStorage.getItem(localStorageKey.WHO_START);
+
+    return localRow &&
+      whoStart &&
+      localRowLength &&
+      JSON.parse(localRow).length > 2
+      ? JSON.parse(localRow)
+      : Array.from({ length: rowLength }, () =>
+        Math.floor(Math.random() * 2).toString()
+      )
+  }
+
+  const saveLocalStorage = (key: string, value: string) => {
+    localStorage.setItem(key, value);
+  }
 
   useEffect(() => {
-    // Save default rowLength in localStorage
-    localStorage.setItem('rowLength', '10');
-
-    dispatch(createRow(rowLength));
-
-    if ((row && row.length < rowLength && row.length > 2) && localStorage.getItem('whoStart')) {
+    if ((row.length > 2 && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!) && localStorage.getItem(localStorageKey.WHO_START)) {
       setStartSettings();
-      setWhoStart(localStorage.getItem('whoStart')!);
+      setWhoStart(localStorage.getItem(localStorageKey.WHO_START)!);
     }
   }, [])
 
   // Create a row when length was changed
   useEffect(() => {
-    dispatch(createRow(rowLength));
-    localStorage.setItem('rowLength', rowLength + '');
+    if ((row.length > 2 && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!) && localStorage.getItem(localStorageKey.WHO_START)) return;
+
+    setRow(createRow(rowLength));
+    saveLocalStorage(localStorageKey.ROW_LENGTH, rowLength.toString());
   }, [rowLength])
 
-  const row = useSelector((state: RootState) => {
-    return state.RowReducer.row
-  });
+  useEffect(() => {
+    /**
+     * In case in previous game was started by Computer and next game has started without any changes
+     * (Start button has been pressed immediately after previous game has been finished)
+     * Computer step will be made, when a new row will be created
+     */
+    if (row.length === rowLength && whoStart === Players.COMPUTER && startStatus) {
+      const defaultArray = [...row];
+      const step = computerMove(defaultArray);
+
+      setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
+      setShowAlert(true);
+
+      // Computer make a move
+      setRow(step);
+    }
+    saveLocalStorage(localStorageKey.ROW, JSON.stringify(row));
+  }, [row])
+
+  const createRow = (rowLength: number) => {
+    return Array.from({ length: rowLength }, () =>
+      Math.floor(Math.random() * 2).toString());
+  }
 
   const combination = useSelector((state: RootState) => {
     return state.CombinationReducer.combination;
@@ -67,7 +109,6 @@ const App: React.FC = () => {
 
   const onStartChange = (e: ChangeEvent<HTMLInputElement>) => {
     setWhoStart(e.target.value);
-    localStorage.setItem('whoStart', e.target.value);
   };
 
   const onMoveClick = () => {
@@ -95,7 +136,7 @@ const App: React.FC = () => {
     }
 
     // Update row after player made a move
-    dispatch(updateRow(humanMove(row, combination)));
+    setRow(humanMove(row, combination));
 
     // Reset previous combination of the numbers
     dispatch(resetCombination());
@@ -114,11 +155,6 @@ const App: React.FC = () => {
       return;
     }
 
-    /**
-     * Create a copy of current array
-     *
-     * For some reason, row also changes after computerMove() function is called
-     */
     const defaultArray = [...row];
     const step = computerMove(defaultArray);
 
@@ -126,7 +162,7 @@ const App: React.FC = () => {
     setShowAlert(true);
 
     // Computer make a move and update row
-    dispatch(updateRow(step));
+    setRow(step);
     setResetCheckbox(true);
 
     // Checking if the game is over and displaying a message about who won
@@ -159,48 +195,49 @@ const App: React.FC = () => {
     setShowAlert(false);
     setMoveButtonStatus(true);
     setStartStatus(false);
+    setWhoStart('');
 
     // Delete row from localStorage
     localStorage.clear();
 
-    dispatch(createRow(rowLength));
+    setRow(createRow(rowLength));
   }
 
   const onStartClick = () => {
     switch (whoStart) {
       case Players.HUMAN:
         setStartSettings();
-        localStorage.setItem('whoStart', Players.HUMAN);
+        saveLocalStorage(localStorageKey.ROW_LENGTH, rowLength.toString());
+        saveLocalStorage(localStorageKey.ROW, JSON.stringify(row));
+        saveLocalStorage(localStorageKey.WHO_START, Players.HUMAN);
 
         // If a game has been played, create a new row of numbers
         if (isGameOver(row)) {
-          dispatch(createRow(rowLength))
+          setRow(createRow(rowLength));
         }
+
 
         break;
       case Players.COMPUTER:
         setStartSettings();
-        localStorage.setItem('whoStart', Players.COMPUTER);
+        saveLocalStorage(localStorageKey.ROW_LENGTH, rowLength.toString());
+        saveLocalStorage(localStorageKey.ROW, JSON.stringify(row));
+        saveLocalStorage(localStorageKey.WHO_START, Players.COMPUTER);
 
         // If a game has been played, create a new row of numbers
         if (isGameOver(row)) {
-          dispatch(createRow(rowLength));
+          setRow(createRow(rowLength));
         }
 
-        /**
-         * In case if a game has been played, for the first move is used data from localStorage, to not display information about previous array
-         *
-         * Previous array -> ['1', '0']
-         * While current -> ['1', '0', '0', '1', '1']
-         *
-         */
-        const step = computerMove(JSON.parse(localStorage.getItem('row')!));
+        if (row.length === 2) break;
 
-        setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${JSON.parse(localStorage.getItem('row')!).join('-')} => ${step.join('-')}` });
+        const step = computerMove(JSON.parse(localStorage.getItem(localStorageKey.ROW)!));
+
+        setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
         setShowAlert(true);
 
         // Computer make a move
-        dispatch(updateRow(step));
+        setRow(step);
 
         break;
       default:
@@ -290,7 +327,6 @@ const App: React.FC = () => {
           </Grid>
         </Grid>
       </Grid>
-
     </>
   )
 }

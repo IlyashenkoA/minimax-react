@@ -1,10 +1,8 @@
 import { combineReducers } from 'redux';
 
-import { RowReducer } from './RowReducer';
 import { CombinationReducer } from './CombinationReducer';
 
 export const rootReducer  = combineReducers({
-    RowReducer,
     CombinationReducer
 });
 
