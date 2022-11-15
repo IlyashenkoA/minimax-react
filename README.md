@@ -1,4 +1,5 @@
 # Game with MiniMax (Alpha Beta pruning) algorithm
+Available here - https://ilyashenkoa.github.io/minimax-typescript-material/
 
 
 ## This is a remix of another MiniMax game, developed on C# - https://github.com/IlyashenkoA/minimax-game
@@ -12,4 +13,4 @@
 ## Features
 * Possibility to choose the length of the row (optimal and maximum length - 10)
 * Ability to choose, who starts the game first
-* If the game was not finished and the page was reloaded, the data will be saved (In progress)
+* If the game was not finished and the page was reloaded, the data will be saved
