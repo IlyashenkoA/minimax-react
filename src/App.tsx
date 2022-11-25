@@ -1,18 +1,18 @@
-import { ChangeEvent, useEffect, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { ChangeEvent, useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { AlertColor, Box, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
-import Button from '@mui/material/Button'
-import Radio from '@mui/material/Radio'
-import RadioGroup from '@mui/material/RadioGroup'
+import { AlertColor, Box, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import Button from '@mui/material/Button';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 
-import Number from './components/Number'
-import ActionAlert from './components/ActionsAlert'
+import Number from './components/Number';
+import ActionAlert from './components/ActionsAlert';
 
-import { RootState } from './store/reducers'
-import { resetCombination } from './store/action-creators/action-creators'
+import { RootState } from './store/reducers';
+import { resetCombination } from './store/action-creators/action-creators';
 
-import { computerMove, getWinner, humanMove, isGameOver } from './minimax/minimax'
+import { computerMove, getWinner, humanMove, isGameOver } from './minimax/minimax';
 
 export enum Players {
   HUMAN = 'HUMAN',
@@ -28,7 +28,7 @@ enum localStorageKey {
 interface IAlert {
   severity: AlertColor,
   title: string,
-  message: string
+  message: string;
 }
 
 const LENGTH = 10;
@@ -55,19 +55,25 @@ const App: React.FC = () => {
       ? JSON.parse(localRow)
       : Array.from({ length: rowLength }, () =>
         Math.floor(Math.random() * 2).toString()
-      )
+      );
   }
 
   const saveLocalStorage = (key: string, value: string) => {
     localStorage.setItem(key, value);
-  }
+  };
+
+  const clearLocalStorage = () => {
+    localStorage.removeItem(localStorageKey.ROW);
+    localStorage.removeItem(localStorageKey.ROW_LENGTH);
+    localStorage.removeItem(localStorageKey.WHO_START);
+  };
 
   useEffect(() => {
     if ((row.length > 2 && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!) && localStorage.getItem(localStorageKey.WHO_START)) {
       setStartSettings();
       setWhoStart(localStorage.getItem(localStorageKey.WHO_START)!);
     }
-  }, [])
+  }, []);
 
   // Create a row when length was changed
   useEffect(() => {
@@ -75,7 +81,7 @@ const App: React.FC = () => {
 
     setRow(createRow(rowLength));
     saveLocalStorage(localStorageKey.ROW_LENGTH, rowLength.toString());
-  }, [rowLength])
+  }, [rowLength]);
 
   useEffect(() => {
     /**
@@ -94,12 +100,12 @@ const App: React.FC = () => {
       setRow(step);
     }
     saveLocalStorage(localStorageKey.ROW, JSON.stringify(row));
-  }, [row])
+  }, [row]);
 
   const createRow = (rowLength: number) => {
     return Array.from({ length: rowLength }, () =>
       Math.floor(Math.random() * 2).toString());
-  }
+  };
 
   const combination = useSelector((state: RootState) => {
     return state.CombinationReducer.combination;
@@ -150,7 +156,7 @@ const App: React.FC = () => {
       setStartStatus(false);
       setResetCheckbox(true);
 
-      localStorage.clear();
+      clearLocalStorage();
 
       return;
     }
@@ -174,7 +180,7 @@ const App: React.FC = () => {
       setStartStatus(false);
       setResetCheckbox(true);
 
-      localStorage.clear();
+      clearLocalStorage();
     }
   };
 
@@ -189,7 +195,7 @@ const App: React.FC = () => {
     setShowAlert(false);
     setMoveButtonStatus(false);
     setStartStatus(true);
-  }
+  };
 
   const setStopSettings = () => {
     setShowAlert(false);
@@ -198,10 +204,10 @@ const App: React.FC = () => {
     setWhoStart('');
 
     // Delete row from localStorage
-    localStorage.clear();
+    clearLocalStorage();
 
     setRow(createRow(rowLength));
-  }
+  };
 
   const onStartClick = () => {
     switch (whoStart) {
@@ -244,15 +250,15 @@ const App: React.FC = () => {
         setAlertData({ severity: 'warning', title: 'Warning', message: 'You have to choose who starts the move.' });
         setShowAlert(true);
     }
-  }
+  };
 
   const onStopClick = () => {
     setStopSettings();
-  }
+  };
 
   const handleRowLength = (e: SelectChangeEvent<number>) => {
     setRowLength(+e.target.value);
-  }
+  };
 
   return (
     <>
@@ -279,7 +285,7 @@ const App: React.FC = () => {
               {row.map((value: string | number, index: number) => {
                 return (
                   <Number key={index} position={index} value={+value} disabled={moveButtonStatus} reset={resetCheckbox} setReset={setResetCheckbox} />
-                )
+                );
               })}
             </Box>
           </Grid>
@@ -328,7 +334,7 @@ const App: React.FC = () => {
         </Grid>
       </Grid>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
