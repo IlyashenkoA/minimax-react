@@ -1,6 +1,12 @@
-<h1 align="center" id="title">Game with MiniMax (Alpha Beta pruning) algorithm</h1>
+<h1 id="title">Game with MiniMax (Alpha Beta pruning) algorithm</h1>
 
-<p id="description">This project is a simple game using the MiniMax algorithm and is also a remix of the project developed using C#. Rules of the game:</p>
+<p id="description">This project is a simple game using the MiniMax algorithm and is also a remix of the project developed using C#. Rules of the game:
+<ul>
+<li>At the start of the game, a random string of numbers is generated, consisting of 0 and 1, for example, "101011"</li>
+<li>Players perform moves in turn. The move involves replacing any two adjacent numbers, based on the following conditions: the pair of numbers 00 gives 1, 01 -> 0, 10 -> 1, and 11 -> 0. Only one pair of numbers can be substituted per turn.</li>
+<li>The game ends when 2 numbers are obtained. If both numbers are the same (11 or 00), then the player wins who started the game is. If they are different (10 or 01), then the second player wins.</li>
+</ul>
+</p>
 
 <h2>🚀 Demo</h2>
 
