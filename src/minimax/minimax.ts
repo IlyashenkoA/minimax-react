@@ -1,39 +1,24 @@
 import { ICombination } from '../store/reducers/CombinationReducer';
-import { Players } from '../App';
+import { Players } from '../store/types/players';
 
 export const computerMove = (row: string[]) => {
-	// Create a copy of current array
-	const array = [...row];
-	const bestMove = getBestMove(array);
+	const bestMove = getBestMove(row);
+	const combination = row[bestMove - 1] + row[bestMove];
+	const newValue = combination === '10' || combination === '00' ? '1' : '0';
 
-	for (const {} of row) {
-		const combination = row[bestMove - 1] + row[bestMove];
-
-		if (combination === '10' || combination === '00') {
-			row[bestMove - 1] = '1';
-			row.splice(bestMove, 1);
-
-			return row;
-		}
-		row[bestMove - 1] = '0';
-		row.splice(bestMove, 1);
-
-		return row;
-	}
+	row[bestMove - 1] = newValue;
+	row.splice(bestMove, 1);
 
 	return row;
 };
 
 export const humanMove = (row: string[], combination: ICombination[]) => {
 	const stringCombination = '' + combination[0].value + combination[1].value;
+	const newValue =
+		stringCombination === '10' || stringCombination === '00' ? '1' : '0';
 
-	if (stringCombination === '10' || stringCombination === '00') {
-		row.splice(combination[1].key, 1);
-		row[combination[0].key] = '1';
-	} else {
-		row.splice(combination[1].key, 1);
-		row[combination[0].key] = '0';
-	}
+	row.splice(combination[1].key, 1);
+	row[combination[0].key] = newValue;
 
 	return row;
 };
@@ -43,41 +28,38 @@ const getBestMove = (row: string[]) => {
 	let position = -1;
 
 	for (let i = 1; i < row.length; i++) {
-		const combination = '' + row[i - 1] + row[i];
+		const combination = row[i - 1] + row[i];
 
 		if (combination === '10' || combination === '00') {
 			const currentRow = [...row];
-			row[i - 1] = '1';
-			row.splice(i, 1);
+			currentRow[i - 1] = '1';
+			currentRow.splice(i, 1);
 
 			const moveValue = minimax({
-				row: row,
+				row: currentRow,
 				depth: 0,
 				isMax: false,
 				alpha: -Infinity,
 				beta: Infinity,
 			});
 
-			row = currentRow;
-
 			if (moveValue > bestValue) {
 				position = i;
 				bestValue = moveValue;
 			}
 		}
+
 		const currentRow = [...row];
-		row[i - 1] = '0';
-		row.splice(i, 1);
+		currentRow[i - 1] = '0';
+		currentRow.splice(i, 1);
 
 		const moveValue = minimax({
-			row: row,
+			row: currentRow,
 			depth: 0,
 			isMax: false,
 			alpha: -Infinity,
 			beta: Infinity,
 		});
-
-		row = currentRow;
 
 		if (moveValue > bestValue) {
 			position = i;
@@ -92,26 +74,12 @@ const isMoveLeft = (row: string[]) => row.length > 2;
 
 const evaluate = (combinations: string[], hasStarted: Players) => {
 	const combination = combinations.join('');
+	const isComputer = hasStarted === Players.COMPUTER;
 
-	if (hasStarted === Players.HUMAN) {
-		if (combination === '11' || combination === '00') {
-			return -10;
-		}
-
-		if (combination === '10' || combination === '01') {
-			return 10;
-		}
-	}
-
-	if (hasStarted === Players.COMPUTER) {
-		if (combination === '10' || combination === '01') {
-			return -10;
-		}
-
-		if (combination === '11' || combination === '10') {
-			return 10;
-		}
-	}
+	if ((combination === '11' || combination === '00') && !isComputer) return -10;
+	if ((combination === '10' || combination === '01') && isComputer) return -10;
+	if ((combination === '11' || combination === '10') && isComputer) return 10;
+	if ((combination === '10' || combination === '01') && !isComputer) return 10;
 
 	return 0;
 };
@@ -120,33 +88,16 @@ export const isGameOver = (row: string[]) => !isMoveLeft(row);
 
 export const getWinner = (row: string[], hasStarted: string) => {
 	const combination = row.join('');
+	const isComputer = hasStarted === Players.COMPUTER;
 
-	if (
-		(combination === '11' || combination === '00') &&
-		hasStarted === Players.HUMAN
-	) {
+	if ((combination === '11' || combination === '00') && !isComputer)
 		return 'Player won!';
-	}
-
-	if (
-		(combination === '11' || combination === '00') &&
-		hasStarted === Players.COMPUTER
-	) {
+	if ((combination === '11' || combination === '00') && isComputer)
 		return 'Computer won';
-	}
-
-	if (
-		(combination === '10' || combination === '01') &&
-		hasStarted === Players.COMPUTER
-	) {
+	if ((combination === '10' || combination === '01') && isComputer)
 		return 'Player won!';
-	}
-	if (
-		(combination === '10' || combination === '01') &&
-		hasStarted === Players.HUMAN
-	) {
+	if ((combination === '10' || combination === '01') && !isComputer)
 		return 'Computer won';
-	}
 
 	return '';
 };
@@ -200,9 +151,10 @@ const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 
 				row = currentRow;
 
-				if (alpha > beta) {
+				if (beta < alpha) {
 					return best;
 				}
+
 			} else {
 				currentRow = [...row];
 				row[i - 1] = '0';
@@ -274,4 +226,4 @@ const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 	}
 
 	return best;
-}
+};

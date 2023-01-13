@@ -1,7 +1,17 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { AlertColor, Box, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {
+  AlertColor,
+  Box,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent
+} from '@mui/material';
 import Button from '@mui/material/Button';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -13,17 +23,9 @@ import { RootState } from './store/reducers';
 import { resetCombination } from './store/action-creators/action-creators';
 
 import { computerMove, getWinner, humanMove, isGameOver } from './minimax/minimax';
-
-export enum Players {
-  HUMAN = 'HUMAN',
-  COMPUTER = 'COMPUTER'
-}
-
-enum localStorageKey {
-  ROW_LENGTH = 'ROW_LENGTH',
-  WHO_START = 'WHO_START',
-  ROW = 'ROW'
-}
+import { clearLocalStorage, saveLocalStorage } from './utils/localStorage';
+import { localStorageKey } from './store/types/localStorage';
+import { Players } from './store/types/players';
 
 interface IAlert {
   severity: AlertColor,
@@ -43,30 +45,11 @@ const App: React.FC = () => {
   const [rowLength, setRowLength] = useState<number>(LENGTH);
   const [row, setRow] = useState<string[]>(getDefaultRow());
 
-  function getDefaultRow() {
-    const localRow = localStorage.getItem(localStorageKey.ROW);
-    const localRowLength = +localStorage.getItem(localStorageKey.ROW_LENGTH)!;
-    const whoStart = localStorage.getItem(localStorageKey.WHO_START);
+  const combination = useSelector((state: RootState) => {
+    return state.CombinationReducer.combination;
+  });
 
-    return localRow &&
-      whoStart &&
-      localRowLength &&
-      JSON.parse(localRow).length > 2
-      ? JSON.parse(localRow)
-      : Array.from({ length: rowLength }, () =>
-        Math.floor(Math.random() * 2).toString()
-      );
-  }
-
-  const saveLocalStorage = (key: string, value: string) => {
-    localStorage.setItem(key, value);
-  };
-
-  const clearLocalStorage = () => {
-    localStorage.removeItem(localStorageKey.ROW);
-    localStorage.removeItem(localStorageKey.ROW_LENGTH);
-    localStorage.removeItem(localStorageKey.WHO_START);
-  };
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if ((row.length > 2 && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!) && localStorage.getItem(localStorageKey.WHO_START)) {
@@ -90,28 +73,49 @@ const App: React.FC = () => {
      * Computer step will be made, when a new row will be created
      */
     if (row.length === rowLength && whoStart === Players.COMPUTER && startStatus) {
-      const defaultArray = [...row];
-      const step = computerMove(defaultArray);
-
-      setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
-      setShowAlert(true);
-
-      // Computer make a move
-      setRow(step);
+      handleComputerStep(row);
     }
+
     saveLocalStorage(localStorageKey.ROW, JSON.stringify(row));
   }, [row]);
 
-  const createRow = (rowLength: number) => {
+  function getDefaultRow() {
+    const localRow = localStorage.getItem(localStorageKey.ROW);
+    const localRowLength = +localStorage.getItem(localStorageKey.ROW_LENGTH)!;
+    const whoStart = localStorage.getItem(localStorageKey.WHO_START);
+
+    return localRow &&
+      whoStart &&
+      localRowLength &&
+      JSON.parse(localRow).length > 2
+      ? JSON.parse(localRow)
+      : Array.from({ length: rowLength }, () =>
+        Math.floor(Math.random() * 2).toString()
+      );
+  }
+
+  const createRow = useCallback((rowLength: number) => {
     return Array.from({ length: rowLength }, () =>
       Math.floor(Math.random() * 2).toString());
+  }, []);
+
+  const handleComputerStep = (row: string[]) => {
+    const step = computerMove([...row]);
+
+    setAlertData(
+      {
+        severity: 'info',
+        title: 'Step',
+        message: `Computer step: ${row.join('-')} => ${step.join('-')}`
+      }
+    );
+    setShowAlert(true);
+
+    // Computer make a move
+    setRow(step);
+
+    return step;
   };
-
-  const combination = useSelector((state: RootState) => {
-    return state.CombinationReducer.combination;
-  });
-
-  const dispatch = useDispatch();
 
   const onStartChange = (e: ChangeEvent<HTMLInputElement>) => {
     setWhoStart(e.target.value);
@@ -128,14 +132,26 @@ const App: React.FC = () => {
      * If the condition is met, the human move is fulfilled.
      */
     if (combination.length > 2 || combination.length < 2) {
-      setAlertData({ severity: 'warning', title: 'Warning', message: 'You have to choose two numbers' });
+      setAlertData(
+        {
+          severity: 'warning',
+          title: 'Warning',
+          message: 'You have to choose two numbers'
+        }
+      );
       setShowAlert(true);
 
       return;
     }
 
     if (sortCombination[1].key - sortCombination[0].key > 1 || sortCombination[1].key - sortCombination[0].key < 1) {
-      setAlertData({ severity: 'warning', title: 'Warning', message: 'You have to choose two adjacent numbers' });
+      setAlertData(
+        {
+          severity: 'warning',
+          title: 'Warning',
+          message: 'You have to choose two adjacent numbers'
+        }
+      );
       setShowAlert(true);
 
       return;
@@ -149,7 +165,13 @@ const App: React.FC = () => {
 
     // Checking if the game is over and displaying a message about who won
     if (isGameOver(row)) {
-      setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(row, whoStart) });
+      setAlertData(
+        {
+          severity: 'success',
+          title: 'Winner:',
+          message: getWinner(row, whoStart)
+        }
+      );
       setShowAlert(true);
 
       setMoveButtonStatus(true);
@@ -161,19 +183,19 @@ const App: React.FC = () => {
       return;
     }
 
-    const defaultArray = [...row];
-    const step = computerMove(defaultArray);
-
-    setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
-    setShowAlert(true);
-
     // Computer make a move and update row
-    setRow(step);
+    const step = handleComputerStep(row);
     setResetCheckbox(true);
 
     // Checking if the game is over and displaying a message about who won
     if (isGameOver(step)) {
-      setAlertData({ severity: 'success', title: 'Winner:', message: getWinner(step, whoStart) });
+      setAlertData(
+        {
+          severity: 'success',
+          title: 'Winner:',
+          message: getWinner(step, whoStart)
+        }
+      );
       setShowAlert(true);
 
       setMoveButtonStatus(true);
@@ -222,7 +244,6 @@ const App: React.FC = () => {
           setRow(createRow(rowLength));
         }
 
-
         break;
       case Players.COMPUTER:
         setStartSettings();
@@ -237,17 +258,17 @@ const App: React.FC = () => {
 
         if (row.length === 2) break;
 
-        const step = computerMove(JSON.parse(localStorage.getItem(localStorageKey.ROW)!));
-
-        setAlertData({ severity: 'info', title: 'Step', message: `Computer step: ${row.join('-')} => ${step.join('-')}` });
-        setShowAlert(true);
-
-        // Computer make a move
-        setRow(step);
+        handleComputerStep(JSON.parse(localStorage.getItem(localStorageKey.ROW)!));
 
         break;
       default:
-        setAlertData({ severity: 'warning', title: 'Warning', message: 'You have to choose who starts the move.' });
+        setAlertData(
+          {
+            severity: 'warning',
+            title: 'Warning',
+            message: 'You have to choose who starts the move.'
+          }
+        );
         setShowAlert(true);
     }
   };
@@ -262,7 +283,13 @@ const App: React.FC = () => {
 
   return (
     <>
-      {showAlert && <ActionAlert severity={alertData.severity} title={alertData.title} message={alertData.message} />}
+      {showAlert
+        && <ActionAlert
+          severity={alertData.severity}
+          title={alertData.title}
+          message={alertData.message}
+        />
+      }
       <Grid
         container
         spacing={0}
@@ -276,37 +303,100 @@ const App: React.FC = () => {
           spacing={4}
           style={{ width: '70vw', margin: '0 auto' }}
         >
-          <Grid item xs={12}
+          <Grid
+            item
+            xs={12}
             height="25vh"
             border="4px solid #1976D2"
             style={{ padding: "0" }}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', margin: '0 20px', height: '100%' }}>
+            <Box
+              sx={
+                {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-evenly',
+                  margin: '0 20px',
+                  height: '100%'
+                }
+              }
+            >
               {row.map((value: string | number, index: number) => {
                 return (
-                  <Number key={index} position={index} value={+value} disabled={moveButtonStatus} reset={resetCheckbox} setReset={setResetCheckbox} />
+                  <Number
+                    key={index}
+                    position={index}
+                    value={+value}
+                    disabled={moveButtonStatus}
+                    reset={resetCheckbox}
+                    setReset={setResetCheckbox}
+                  />
                 );
               })}
             </Box>
           </Grid>
-          <Grid item xs={6} height="30vh" style={{ paddingLeft: '0' }}>
+          <Grid
+            item
+            xs={6}
+            height="30vh"
+            style={{ paddingLeft: '0' }}
+          >
             <Grid
               container
               spacing={2}
               style={{ marginLeft: '0' }}
               columnSpacing={4}
             >
-              <Grid item xs={6} style={{ paddingLeft: '0' }}>
-                <Button variant="contained" disabled={moveButtonStatus} onClick={onMoveClick}>Make a Move</Button>
+              <Grid
+                item
+                xs={6}
+                style={{ paddingLeft: '0' }}
+              >
+                <Button
+                  variant="contained"
+                  disabled={moveButtonStatus}
+                  onClick={onMoveClick}
+                >
+                  Make a Move
+                </Button>
               </Grid>
-              <Grid item xs={6} />
-              <Grid item xs={6} style={{ paddingLeft: '0' }}>
+              <Grid
+                item
+                xs={6}
+              />
+              <Grid
+                item
+                xs={6}
+                style={{ paddingLeft: '0' }}
+              >
                 <RadioGroup onChange={onStartChange}>
-                  <FormControlLabel value={Players.HUMAN} control={<Radio disabled={startStatus} checked={whoStart === Players.HUMAN} />} label="Human" />
-                  <FormControlLabel value={Players.COMPUTER} control={<Radio disabled={startStatus} checked={whoStart === Players.COMPUTER} />} label="Computer" />
+                  <FormControlLabel
+                    value={Players.HUMAN}
+                    control={
+                      <Radio
+                        disabled={startStatus}
+                        checked={whoStart === Players.HUMAN} />
+                    }
+                    label="Human"
+                  />
+                  <FormControlLabel
+                    value={Players.COMPUTER}
+                    control={
+                      <Radio
+                        disabled={startStatus}
+                        checked={whoStart === Players.COMPUTER}
+                      />
+                    }
+                    label="Computer"
+                  />
                 </RadioGroup>
               </Grid>
-              <Grid item xs={6} style={{ paddingLeft: '0' }}>
+              <Grid
+                item
+                xs={6}
+                style={{ paddingLeft: '0' }}
+              >
                 <FormControl sx={{ width: '150px' }}>
                   <InputLabel id="demo-simple-select-label">Row length</InputLabel>
                   <Select
@@ -323,11 +413,31 @@ const App: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} style={{ paddingLeft: '0' }}>
-                <Button variant="contained" onClick={onStartClick} disabled={startStatus}>Start/Repeat</Button>
+              <Grid
+                item
+                xs={6}
+                style={{ paddingLeft: '0' }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={onStartClick}
+                  disabled={startStatus}
+                >
+                  Start/Repeat
+                </Button>
               </Grid>
-              <Grid item xs={6} style={{ paddingLeft: '0' }}>
-                <Button variant="outlined" onClick={onStopClick} sx={{ width: '150px' }}>Stop</Button>
+              <Grid
+                item
+                xs={6}
+                style={{ paddingLeft: '0' }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={onStopClick}
+                  sx={{ width: '150px' }}
+                >
+                  Stop
+                </Button>
               </Grid>
             </Grid>
           </Grid>
