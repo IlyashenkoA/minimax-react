@@ -154,7 +154,6 @@ const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 				if (beta < alpha) {
 					return best;
 				}
-
 			} else {
 				currentRow = [...row];
 				row[i - 1] = '0';
@@ -227,3 +226,5 @@ const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 
 	return best;
 };
+
+module.exports = { isMoveLeft, getWinner, isGameOver };
