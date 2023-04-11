@@ -70,7 +70,7 @@ const getBestMove = (row: string[]) => {
 	return position;
 };
 
-const isMoveLeft = (row: string[]) => row.length > 2;
+export const isMoveLeft = (row: string[]) => row.length > 2;
 
 const evaluate = (combinations: string[], hasStarted: Players) => {
 	const combination = combinations.join('');
