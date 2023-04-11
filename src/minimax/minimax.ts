@@ -114,17 +114,11 @@ const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 	let currentRow;
 	let score = evaluate(row, Players.COMPUTER);
 
-	if (score === 10) {
-		return score;
-	}
+	if (score === 10) return score;
 
-	if (score === -10) {
-		return score;
-	}
+	if (score === -10) return score;
 
-	if (!isMoveLeft(row)) {
-		return 0;
-	}
+	if (!isMoveLeft(row)) return 0;
 
 	if (isMax) {
 		let best = -1000;
@@ -226,5 +220,3 @@ const minimax = ({ row, depth, isMax, alpha, beta }: MiniMaxProps) => {
 
 	return best;
 };
-
-module.exports = { isMoveLeft, getWinner, isGameOver };

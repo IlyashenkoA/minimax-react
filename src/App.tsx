@@ -1,9 +1,8 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   AlertColor,
-  Box,
   FormControl,
   FormControlLabel,
   Grid,
@@ -16,16 +15,16 @@ import Button from '@mui/material/Button';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 
-import Number from './components/Number';
 import ActionAlert from './components/ActionsAlert';
+import Number from './components/Number';
 
-import { RootState } from './store/reducers';
 import { resetCombination } from './store/action-creators/action-creators';
+import { RootState } from './store/reducers';
 
 import { computerMove, getWinner, humanMove, isGameOver } from './minimax/minimax';
-import { clearLocalStorage, saveLocalStorage } from './utils/localStorage';
 import { localStorageKey } from './store/types/localStorage';
 import { Players } from './store/types/players';
+import { clearLocalStorage, saveLocalStorage } from './utils/localStorage';
 
 interface IAlert {
   severity: AlertColor,
@@ -45,14 +44,16 @@ const App: React.FC = () => {
   const [rowLength, setRowLength] = useState<number>(LENGTH);
   const [row, setRow] = useState<string[]>(getDefaultRow());
 
-  const combination = useSelector((state: RootState) => {
-    return state.CombinationReducer.combination;
-  });
+  const combination = useSelector((state: RootState) => state.CombinationReducer.combination);
 
   const dispatch = useDispatch();
 
+
   useEffect(() => {
-    if ((row.length > 2 && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!) && localStorage.getItem(localStorageKey.WHO_START)) {
+    if ((row.length > 2
+      && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!)
+      && localStorage.getItem(localStorageKey.WHO_START)
+    ) {
       setStartSettings();
       setWhoStart(localStorage.getItem(localStorageKey.WHO_START)!);
     }
@@ -60,7 +61,10 @@ const App: React.FC = () => {
 
   // Create a row when length was changed
   useEffect(() => {
-    if ((row.length > 2 && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!) && localStorage.getItem(localStorageKey.WHO_START)) return;
+    if ((row.length > 2
+      && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!)
+      && localStorage.getItem(localStorageKey.WHO_START)
+    ) return;
 
     setRow(createRow(rowLength));
     saveLocalStorage(localStorageKey.ROW_LENGTH, rowLength.toString());
@@ -84,10 +88,10 @@ const App: React.FC = () => {
     const localRowLength = +localStorage.getItem(localStorageKey.ROW_LENGTH)!;
     const whoStart = localStorage.getItem(localStorageKey.WHO_START);
 
-    return localRow &&
-      whoStart &&
-      localRowLength &&
-      JSON.parse(localRow).length > 2
+    return localRow
+      && whoStart
+      && localRowLength
+      && JSON.parse(localRow).length > 2
       ? JSON.parse(localRow)
       : Array.from({ length: rowLength }, () =>
         Math.floor(Math.random() * 2).toString()
@@ -144,7 +148,8 @@ const App: React.FC = () => {
       return;
     }
 
-    if (sortCombination[1].key - sortCombination[0].key > 1 || sortCombination[1].key - sortCombination[0].key < 1) {
+    if (sortCombination[1].key - sortCombination[0].key > 1
+      || sortCombination[1].key - sortCombination[0].key < 1) {
       setAlertData(
         {
           severity: 'warning',
@@ -296,50 +301,44 @@ const App: React.FC = () => {
         direction="column"
         alignItems="center"
         justifyContent="center"
-        style={{ minHeight: '100vh' }}
+        sx={{ minHeight: '100vh', minWidth: '500px' }}
       >
         <Grid
           container
           spacing={4}
-          style={{ width: '70vw', margin: '0 auto' }}
+          sx={{ padding: '0 4rem', margin: '0 auto', maxWidth: '60rem', width: '100%' }}
         >
           <Grid
             item
             xs={12}
-            height="25vh"
-            border="4px solid #1976D2"
-            style={{ padding: "0" }}
-          >
-            <Box
-              sx={
-                {
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-evenly',
-                  margin: '0 20px',
-                  height: '100%'
-                }
+            border="0.25rem solid #1976D2"
+            borderRadius='1.5rem'
+            sx={
+              {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                height: '100%',
+                padding: '2rem 1rem'
               }
-            >
-              {row.map((value: string | number, index: number) => {
-                return (
-                  <Number
-                    key={index}
-                    position={index}
-                    value={+value}
-                    disabled={moveButtonStatus}
-                    reset={resetCheckbox}
-                    setReset={setResetCheckbox}
-                  />
-                );
-              })}
-            </Box>
+            }
+          >
+            {row.map((value: string | number, index: number) => {
+              return (
+                <Number
+                  key={index}
+                  position={index}
+                  value={+value}
+                  disabled={moveButtonStatus}
+                  reset={resetCheckbox}
+                  setReset={setResetCheckbox}
+                />
+              );
+            })}
           </Grid>
           <Grid
             item
-            xs={6}
-            height="30vh"
             style={{ paddingLeft: '0' }}
           >
             <Grid
@@ -397,7 +396,7 @@ const App: React.FC = () => {
                 xs={6}
                 style={{ paddingLeft: '0' }}
               >
-                <FormControl sx={{ width: '150px' }}>
+                <FormControl sx={{ width: '10rem' }}>
                   <InputLabel id="demo-simple-select-label">Row length</InputLabel>
                   <Select
                     defaultValue={rowLength}
@@ -434,7 +433,7 @@ const App: React.FC = () => {
                 <Button
                   variant="outlined"
                   onClick={onStopClick}
-                  sx={{ width: '150px' }}
+                  sx={{ width: '10rem' }}
                 >
                   Stop
                 </Button>
