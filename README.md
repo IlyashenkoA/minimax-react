@@ -10,7 +10,7 @@
 
 <h2>🚀 Demo</h2>
 
-[https://ilyashenkoa.github.io/minimax-typescript-material/](https://ilyashenkoa.github.io/minimax-typescript-material/)
+[https://minimax-react-czefasw0w-ilyashenkoa.vercel.app/](https://minimax-react-czefasw0w-ilyashenkoa.vercel.app/)
 
 <h2>Project Screenshots:</h2>
 
