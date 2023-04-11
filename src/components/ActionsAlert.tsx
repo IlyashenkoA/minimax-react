@@ -12,12 +12,10 @@ const ActionAlert = ({ severity, title, message }: AlertProps) => {
             variant='outlined'
             severity={severity}
             sx={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translate(-50%, 0)',
                 marginTop: '2vh',
                 width: '80vw',
-                maxWidth: '60rem'
+                minWidth: '350px',
+                maxWidth: '40rem'
             }}
         >
             <AlertTitle>{title}</AlertTitle>
