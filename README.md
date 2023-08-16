@@ -22,15 +22,15 @@
 
 <img src="https://i.imgur.com/lXmuoIy.png" alt="project-screenshot" width="700">
 
-  
-  
 <h2>🧐 Features</h2>
 
 Here're some of the project's best features:
 
-*   It is possible to choose who starts the game
-*   If the game was not finished and the page was reloaded the data will be saved
-*   Possibility to choose the length of the row (optimal and maximum length - 10)
+- It is possible to choose who starts the game
+- If the game was not finished and the page was reloaded the
+  data will be saved
+- Possibility to choose the length of the row (optimal and
+  maximum length - 10)
 
 <h2>🛠️ Installation Steps:</h2>
 
@@ -52,13 +52,11 @@ npm install
 npm run dev
 ```
 
-  
-  
 <h2>💻 Built with</h2>
 
 Technologies used in the project:
 
-*   React
-*   Redux
-*   TypeScript
-*   Material UI
+- React
+- Redux
+- TypeScript
+- Material UI

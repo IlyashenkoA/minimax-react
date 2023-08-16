@@ -8,7 +8,9 @@ import { store } from './store';
 import 'normalize.css';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+).render(
   <Provider store={store}>
     <App />
   </Provider>

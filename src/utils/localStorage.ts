@@ -1,6 +1,9 @@
-import { localStorageKey } from "../store/types/localStorage";
+import { localStorageKey } from '../store/types/localStorage';
 
-export const saveLocalStorage = (key: string, value: string) => {
+export const saveLocalStorage = (
+  key: string,
+  value: string
+) => {
   localStorage.setItem(key, value);
 };
 
