@@ -48,7 +48,6 @@ const App: React.FC = () => {
 
   const dispatch = useDispatch();
 
-
   useEffect(() => {
     if ((row.length > 2
       && row.length < +localStorage.getItem(localStorageKey.ROW_LENGTH)!)
