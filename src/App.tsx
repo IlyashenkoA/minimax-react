@@ -369,7 +369,7 @@ const App: React.FC = () => {
         direction='column'
         alignItems='center'
         justifyContent='center'
-        sx={{ minHeight: '100vh', minWidth: '500px' }}
+        sx={{ minWidth: '500px', flexGrow: '1' }}
       >
         <Grid
           container
