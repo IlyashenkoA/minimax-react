@@ -1,38 +1,48 @@
-<h1 id="title">Game with MiniMax (Alpha Beta pruning) algorithm</h1>
+<br/>
+<p align="center">
+  <h3 align="center">Game of Logic: Unleash Your Strategy with Minimax</h3>
 
-<p id="description">This project is a simple game using the MiniMax algorithm and is also a remix of the project developed using C#. Rules of the game:
-<ul>
-<li>At the start of the game, a random string of numbers is generated, consisting of 0 and 1, for example, "101011"</li>
-<li>Players perform moves in turn. The move involves replacing any two adjacent numbers, based on the following conditions: the pair of numbers 00 gives 1, 01 -> 0, 10 -> 1, and 11 -> 0. Only one pair of numbers can be substituted per turn.</li>
-<li>The game ends when 2 numbers are obtained. If both numbers are the same (11 or 00), then the player wins who started the game is. If they are different (10 or 01), then the second player wins.</li>
-</ul>
+  <p align="center">
+    <a href="https://minimax-react.vercel.app/">View Demo</a>
+  </p>
 </p>
 
-<h2>🚀 Demo</h2>
+## About The Project
 
-[https://minimax-react-czefasw0w-ilyashenkoa.vercel.app/](https://minimax-react-czefasw0w-ilyashenkoa.vercel.app/)
+Explore a dynamic gaming experience that seamlessly blends strategy, logic, and chance—the embodiment of a C# project reborn and elevated through the prism of the MiniMax algorithm. This innovative game invites you to immerse yourself in a world where calculated moves and binary brilliance intertwine.
 
-<h2>Project Screenshots:</h2>
+<img src="https://github.com/IlyashenkoA/minimax-react/assets/12977611/5aa204e1-1dbf-488e-9e89-264f287d9690" width="700" />
+<img src="https://github.com/IlyashenkoA/minimax-react/assets/12977611/6fe34b77-c604-4d27-80b4-4bf98907c7fc" width="700" />
+<img src="https://github.com/IlyashenkoA/minimax-react/assets/12977611/b973a8a4-1393-4a1f-9438-5011f300054e" width="700" />
+<img src="https://github.com/IlyashenkoA/minimax-react/assets/12977611/e32d61af-de4f-4138-8c52-142955a33b34" width="700" />
 
-<img src="https://i.imgur.com/7qyrF9y.png" alt="project-screenshot" width="700">
+### **Gameplay and Rules:**
 
-<img src="https://i.imgur.com/dztvq3y.png" alt="project-screenshot" width="700">
+As the curtains rise, a random string of binary numbers forms the foundation for your journey—a fresh tableau for every match. Strategy unfurls as players alternate moves, with each turn defined by a skillful substitution of adjacent numbers. A duo of digits transforms under your calculated choices: 00 to 1, 01 to 0, 10 to 1, and 11 to 0—a dance of logic and tactics.
 
-<img src="https://i.imgur.com/0Efk4G5.png" alt="project-screenshot" width="700">
+Every exchange brings you closer to a gripping crescendo—a pair of numbers standing firm. The climax is revealed as symmetry or dissimilarity paints the canvas. If unity reigns, the torch passes to the player who initiated this journey. Yet, if duality persists, victory crowns the challenger who responded with precision.
 
-<img src="https://i.imgur.com/lXmuoIy.png" alt="project-screenshot" width="700">
+### **Key Features:**
 
-<h2>🧐 Features</h2>
+- **MiniMax Strategy:** Engage in a cerebral tango, masterminded by the MiniMax algorithm with Alpha-Beta pruning. Immerse yourself in dynamic gameplay, where calculated moves hold the key to triumph.
 
-Here're some of the project's best features:
+- **Choice of Starting Player:** Seize control with the power to decide who takes the inaugural step. Strategy and advantage become intertwined, redefining each match's tempo.
 
-- It is possible to choose who starts the game
-- If the game was not finished and the page was reloaded the
-  data will be saved
-- Possibility to choose the length of the row (optimal and
-  maximum length - 10)
+- **Persisting Progress:** Navigate the ebb and flow of the game, even if reality beckons a reload. Data remains steadfast, saving your in-game choices and positions—ensuring continuity in every session.
 
-<h2>🛠️ Installation Steps:</h2>
+- **Row Length Customization:** Craft your battlefield with precision. Tailor the length of the binary row, defining optimal and maximal lengths (up to 10). A strategic canvas awaits your touch.
+
+## Built With
+
+* React
+* Redux
+* Material UI
+* TypeScript
+
+## Getting Started
+
+
+### Installation
 
 <p>1. Clone the repository</p>
 
@@ -51,12 +61,3 @@ npm install
 ```
 npm run dev
 ```
-
-<h2>💻 Built with</h2>
-
-Technologies used in the project:
-
-- React
-- Redux
-- TypeScript
-- Material UI
